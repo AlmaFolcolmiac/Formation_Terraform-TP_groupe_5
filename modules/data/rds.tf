@@ -1,46 +1,102 @@
-# =============================================================================
-# modules/data/rds.tf
-# RDS PostgreSQL Multi-AZ + DB subnet group + parameter group.
-# =============================================================================
-# Ressources a declarer :
-#
-#   - aws_db_subnet_group    "main"
-#       - name       = "${local.name_prefix}-db-subnet-group"
-#       - subnet_ids = values(var.private_db_subnet_ids)
-#
-#   - aws_db_parameter_group "postgres16"
-#       - family = "postgres16"
-#       - name   = "${local.name_prefix}-pg16"
-#       - parameter { name = "rds.force_ssl"       value = "1" }
-#       - parameter { name = "log_connections"      value = "1" }
-#       - parameter { name = "log_disconnections"   value = "1" }
-#
-#   - aws_db_instance        "nextcloud"
-#       - engine                  = "postgres"
-#       - engine_version          = "16.4"
-#       - instance_class          = "db.t3.micro"
-#       - allocated_storage       = 20
-#       - max_allocated_storage   = 100
-#       - storage_type            = "gp3"
-#       - storage_encrypted       = true
-#       - kms_key_id              = var.kms_key_arn
-#       - multi_az                = true
-#       - db_name                 = "nextcloud"
-#       - username                = "nextcloud"
-#       - password                = data.aws_secretsmanager_secret_version.db_password.secret_string
-#       - port                    = 5432
-#       - db_subnet_group_name    = aws_db_subnet_group.main.name
-#       - parameter_group_name    = aws_db_parameter_group.postgres16.name
-#       - vpc_security_group_ids  = [var.db_security_group_id]
-#       - publicly_accessible     = false
-#       - skip_final_snapshot     = true   (dev uniquement)
-#       - deletion_protection     = false  (dev uniquement)
-#       - backup_retention_period = 7
-#       - lifecycle { ignore_changes = [password] }  # pour permettre rotation manuelle sans drift
-# =============================================================================
+# rds.tf (partie 2 : RDS)
 
-# TODO(role-4) : aws_db_subnet_group
+# -----------------------------------------------------------------------------
+# DB Subnet Group : RDS a besoin d au moins 2 subnets sur 2 AZ
+# -----------------------------------------------------------------------------
+resource "aws_db_subnet_group" "nextcloud" {
+  name       = "${local.name_prefix}-db-subnets"
+  subnet_ids = values(var.private_db_subnet_ids)
 
-# TODO(role-4) : aws_db_parameter_group
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-db-subnets"
+  })
+}
 
-# TODO(role-4) : aws_db_instance
+# -----------------------------------------------------------------------------
+# Parameter Group : parametres PostgreSQL personnalises
+# On force TLS cote serveur (rds.force_ssl = 1)
+# -----------------------------------------------------------------------------
+resource "aws_db_parameter_group" "nextcloud" {
+  name   = "${local.name_prefix}-pg16"
+  family = "postgres16"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "1"
+  }
+
+  parameter {
+    name  = "log_statement"
+    value = "ddl"  # logue CREATE/ALTER/DROP (audit)
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-pg16-params"
+  })
+}
+
+# -----------------------------------------------------------------------------
+# Instance RDS PostgreSQL 16 Multi-AZ chiffree KMS
+# -----------------------------------------------------------------------------
+resource "aws_db_instance" "nextcloud" {
+  identifier = "${local.name_prefix}-nextcloud"
+
+  # Moteur
+  engine         = "postgres"
+  engine_version = var.db_engine_version
+
+  # Taille compute + storage
+  instance_class        = var.db_instance_class
+  allocated_storage     = var.db_allocated_storage
+  max_allocated_storage = var.db_max_allocated_storage
+  storage_type          = "gp3"
+  storage_encrypted     = true
+  kms_key_id            = var.kms_key_arn
+
+  # Base, identifiants
+  db_name  = "nextcloud"
+  username = "nextcloud"
+  password = data.aws_secretsmanager_secret_version.db_password.secret_string
+
+  # Reseau (prive uniquement, pas d acces public)
+  db_subnet_group_name   = aws_db_subnet_group.nextcloud.name
+  vpc_security_group_ids = [var.db_security_group_id]
+  publicly_accessible    = false
+  port                   = 5432
+
+  # Haute dispo
+  multi_az                = true
+  backup_retention_period = 7
+  backup_window           = "03:00-04:00"
+  maintenance_window      = "sun:04:00-sun:05:00"
+
+  # Upgrades
+  auto_minor_version_upgrade = true
+  apply_immediately          = false  # false en prod, ici peu importe
+
+  # Logs vers CloudWatch
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  performance_insights_enabled    = true
+  performance_insights_kms_key_id = var.kms_key_arn
+
+  # Destruction (dev only)
+  deletion_protection      = false  # 🟡 TRUE en prod obligatoire
+  skip_final_snapshot      = true   # 🟡 FALSE en prod obligatoire
+  delete_automated_backups = true
+
+  # Parametres custom
+  parameter_group_name = aws_db_parameter_group.nextcloud.name
+
+  # IAM auth (bonus securite - ne remplace pas le mdp, s ajoute)
+  iam_database_authentication_enabled = true
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-nextcloud-rds"
+  })
+
+  lifecycle {
+    # Le password peut changer si le Role 5 regenere le secret.
+    # Ignorer evite un recreate cyclique en cas de rotation.
+    ignore_changes = [password]
+  }
+}
