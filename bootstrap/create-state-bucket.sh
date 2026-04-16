@@ -16,7 +16,7 @@
 set -euo pipefail
 
 USERNAME="${USERNAME:-kolab-formation}"
-REGION="${REGION:-eu-west-1}"
+REGION="${REGION:-eu-west-3}"
 
 BUCKET="tf-state-${USERNAME}-kolab"
 KMS_ALIAS="alias/tf-state-${USERNAME}"

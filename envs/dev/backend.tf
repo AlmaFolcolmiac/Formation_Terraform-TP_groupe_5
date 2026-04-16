@@ -11,13 +11,13 @@ terraform {
     # 🟣 A ADAPTER : nom du bucket cree par bootstrap/create-state-bucket.sh
     # Par defaut le script cree "tf-state-kolab-formation-<USERNAME>".
     # Remplacez la valeur ci-dessous par le nom exact renvoye par le script.
-    bucket = "tf-state-kolab-formation-TEAM"
+    bucket = "tf-state-equipe5-kolab"
     key    = "envs/dev/terraform.tfstate"
-    region = "eu-west-1"
+    region = "eu-west-3"
 
     # Chiffrement cote objet state via la CMK bootstrap (alias cree par le script)
     encrypt    = true
-    kms_key_id = "alias/tf-state-kolab-formation"
+    kms_key_id = "alias/tf-state-equipe5"
 
     # Locking natif S3 (TF 1.10+). Remplace DynamoDB.
     use_lockfile = true
