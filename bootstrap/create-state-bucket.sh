@@ -10,7 +10,7 @@
 #
 # Usage :
 #   export AWS_PROFILE=adrien-semifir
-#   USERNAME=kolab-team1 REGION=eu-west-1 ./bootstrap/create-state-bucket.sh
+#   USERNAME=kolab-team1 REGION=eu-west-3 ./bootstrap/create-state-bucket.sh
 # -----------------------------------------------------------------------------
 
 set -euo pipefail

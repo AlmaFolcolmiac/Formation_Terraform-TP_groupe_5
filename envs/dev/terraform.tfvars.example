@@ -9,9 +9,9 @@
 # -----------------------------------------------------------------------------
 
 # 🔴 Ne PAS mettre 0.0.0.0/0 : la validation refuse (anti-pattern TP).
-allowed_admin_cidr = "203.0.113.42/32"
+allowed_admin_cidr = "92.150.78.247/32"
 
 # Defaut OK, override si besoin.
-# aws_region   = "eu-west-1"
+# aws_region   = "eu-west-3"
 # project_name = "kolab"
 # environment  = "dev"
