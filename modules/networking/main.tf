@@ -81,7 +81,7 @@ resource "aws_subnet" "public" {
 # -----------------------------------------------------------------------------
 # Subnets Privé (1 par AZ)
 # -----------------------------------------------------------------------------
-resource "aws_subnet" "private" {
+resource "aws_subnet" "private_app" {
   for_each = local.private_app_subnets
 
   vpc_id            = aws_vpc.main.id
@@ -201,7 +201,7 @@ resource "aws_route_table_association" "private_db" {
 # =============================================================================
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.main.id
-  service_name      = "com.amazonaws.eu-west-1.s3"
+  service_name      = "com.amazonaws.eu-west-3.s3"
   vpc_endpoint_type = "Gateway"
 
   # Injecter la route dans la RT privee
@@ -242,7 +242,7 @@ resource "aws_vpc_security_group_ingress_rule" "vpce_https_from_vpc" {
 # =============================================================================
 resource "aws_vpc_endpoint" "secretsmanager" {
   vpc_id              = aws_vpc.main.id
-  service_name        = "com.amazonaws.eu-west-1.secretsmanager"
+  service_name        = "com.amazonaws.eu-west-3.secretsmanager"
   vpc_endpoint_type   = "Interface"
   private_dns_enabled = true
 

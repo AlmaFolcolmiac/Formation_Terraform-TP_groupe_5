@@ -1,3 +1,13 @@
+# rds.tf (partie 1 : lecture du secret)
+
+# -----------------------------------------------------------------------------
+# Lecture du mot de passe DB genere par le module security
+# Le secret arn est passe en variable, Terraform resout le graphe de dependances.
+# -----------------------------------------------------------------------------
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = var.db_password_secret_arn
+}
+
 # rds.tf (partie 2 : RDS)
 
 # -----------------------------------------------------------------------------
@@ -27,7 +37,7 @@ resource "aws_db_parameter_group" "nextcloud" {
 
   parameter {
     name  = "log_statement"
-    value = "ddl"  # logue CREATE/ALTER/DROP (audit)
+    value = "ddl" # logue CREATE/ALTER/DROP (audit)
   }
 
   tags = merge(local.common_tags, {
@@ -72,7 +82,7 @@ resource "aws_db_instance" "nextcloud" {
 
   # Upgrades
   auto_minor_version_upgrade = true
-  apply_immediately          = false  # false en prod, ici peu importe
+  apply_immediately          = false # false en prod, ici peu importe
 
   # Logs vers CloudWatch
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
@@ -80,8 +90,8 @@ resource "aws_db_instance" "nextcloud" {
   performance_insights_kms_key_id = var.kms_key_arn
 
   # Destruction (dev only)
-  deletion_protection      = false  # 🟡 TRUE en prod obligatoire
-  skip_final_snapshot      = true   # 🟡 FALSE en prod obligatoire
+  deletion_protection      = false # 🟡 TRUE en prod obligatoire
+  skip_final_snapshot      = true  # 🟡 FALSE en prod obligatoire
   delete_automated_backups = true
 
   # Parametres custom
