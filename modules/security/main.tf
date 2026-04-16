@@ -25,3 +25,22 @@
 #
 # Utilises pour construire les ARN dans les key policies (root account) et
 # les assume role policies.
+
+
+# Recupere l account ID courant (pour les key policies)
+data "aws_caller_identity" "current" {}
+
+# Partition AWS (aws, aws-cn, aws-us-gov) - rend le code portable
+data "aws_partition" "current" {}
+
+# Nom commun prefixe pour tout le module : ex "kolab-dev"
+locals {
+  name_prefix = "${var.project_name}-${var.environment}"
+
+  common_tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+    Module      = "security"
+  }
+}
