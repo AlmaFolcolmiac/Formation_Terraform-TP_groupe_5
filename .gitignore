@@ -1,0 +1,49 @@
+# -----------------------------------------------------------------------------
+# .gitignore Terraform - TP05 Nextcloud
+# -----------------------------------------------------------------------------
+
+# Providers et modules telecharges
+.terraform/
+.terraform.lock.hcl.backup
+
+# State files (jamais commiter : contient des secrets en clair)
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfstate.d/
+
+# Crashes
+crash.log
+crash.*.log
+
+# Variables locales (ne JAMAIS commiter)
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+!*.tfvars.json.example
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# OS / editeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Infracost
+infracost*.json
+.infracost/
+
+# tfsec / checkov
+.tfsec/
+checkov-report.*

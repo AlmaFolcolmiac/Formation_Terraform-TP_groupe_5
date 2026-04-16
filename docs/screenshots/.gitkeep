@@ -1,0 +1,8 @@
+# Placeholder
+# Deposez ici les 5 captures d'ecran obligatoires :
+#
+#   01-plan-dev.png          — terraform plan montrant "Plan: N to add"
+#   02-apply-success.png     — "Apply complete! Resources: N added" + outputs
+#   03-nextcloud-login.png   — page de login Nextcloud dans le navigateur (URL ALB)
+#   04-file-in-s3.png        — console AWS S3 avec un fichier uploade + chiffrement KMS
+#   05-destroy-success.png   — "Destroy complete! Resources: N destroyed"
