@@ -22,7 +22,7 @@ variable "vpc_cidr" {
 variable "azs" {
   description = "Liste des Availability Zones. 2 AZ minimum pour Multi-AZ RDS."
   type        = list(string)
-  default     = ["eu-west-1a", "eu-west-1b"]
+  default     = ["eu-west-3a", "eu-west-3b"]
 
   validation {
     condition     = length(var.azs) == 2
