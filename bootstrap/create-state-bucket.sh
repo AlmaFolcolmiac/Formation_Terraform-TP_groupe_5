@@ -10,13 +10,13 @@
 #
 # Usage :
 #   export AWS_PROFILE=adrien-semifir
-#   USERNAME=kolab-team1 REGION=eu-west-1 ./bootstrap/create-state-bucket.sh
+#   USERNAME=kolab-team1 REGION=eu-west-3 ./bootstrap/create-state-bucket.sh
 # -----------------------------------------------------------------------------
 
 set -euo pipefail
 
 USERNAME="${USERNAME:-kolab-formation}"
-REGION="${REGION:-eu-west-1}"
+REGION="${REGION:-eu-west-3}"
 
 BUCKET="tf-state-${USERNAME}-kolab"
 KMS_ALIAS="alias/tf-state-${USERNAME}"
