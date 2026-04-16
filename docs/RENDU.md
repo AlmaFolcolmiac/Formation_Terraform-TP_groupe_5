@@ -52,8 +52,8 @@ VPC 10.30.0.0/16 sur 2 AZ (Paris) avec 6 subnets segmentés par rôle. Un ALB pu
 
 ### Schéma Mermaid (à jour avec ce qui a été réellement déployé)
 
-graph TD
-
+```mermaid
+flowchart TB
     subgraph Internet["Internet (Public)"]
 
         User((Utilisateur))
@@ -163,6 +163,7 @@ graph TD
     ALB -- SSL/TLS --> ACM
 
     EC2_A & EC2_B -- Permissions --> IAM
+```
  
 > 🔹 Astuce : copiez le schéma du fichier `ARCHITECTURE.md` que vous avez maintenu pendant la journée.
 
