@@ -84,5 +84,5 @@ variable "instance_type" {
 variable "aws_region" {
   description = "Region AWS (injectee dans le user_data)."
   type        = string
-  default     = "eu-west-1"
+  default     = "eu-west-3"
 }

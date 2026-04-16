@@ -1,0 +1,67 @@
+# modules/compute/templates/nextcloud-user-data.sh.tftpl
+#!/bin/bash
+# User data Nextcloud - execute au boot EC2
+# Variables injectees par Terraform via templatefile() :
+#   $${db_endpoint}, $${db_name}, $${db_username},
+#   $${db_password_secret_arn}, $${admin_password_secret_arn},
+#   $${s3_primary_bucket_name}, $${alb_dns_name}, $${aws_region}
+
+set -euxo pipefail
+
+exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+
+echo "===> Update systeme + install Docker + AWS CLI"
+dnf update -y
+dnf install -y docker
+systemctl enable --now docker
+usermod -aG docker ec2-user
+
+# AWS CLI v2 est preinstalle sur AL2023
+
+echo "===> Attente que RDS reponde (jusqu a 5 min)"
+for i in {1..30}; do
+  if timeout 3 bash -c "cat < /dev/tcp/${db_endpoint}/5432" 2>/dev/null; then
+    echo "RDS OK"
+    break
+  fi
+  echo "RDS pas encore pret, retry $i/30..."
+  sleep 10
+done
+
+echo "===> Recuperation des secrets via IAM instance profile"
+DB_PASSWORD=$(aws secretsmanager get-secret-value \
+  --region ${aws_region} \
+  --secret-id "${db_password_secret_arn}" \
+  --query SecretString --output text)
+
+ADMIN_PASSWORD=$(aws secretsmanager get-secret-value \
+  --region ${aws_region} \
+  --secret-id "${admin_password_secret_arn}" \
+  --query SecretString --output text)
+
+echo "===> Pull + run Nextcloud container"
+docker pull nextcloud:30-apache
+
+docker run -d --name nextcloud \
+  --restart always \
+  -p 80:80 \
+  -e POSTGRES_HOST="${db_endpoint}" \
+  -e POSTGRES_DB="${db_name}" \
+  -e POSTGRES_USER="${db_username}" \
+  -e POSTGRES_PASSWORD="$DB_PASSWORD" \
+  -e NEXTCLOUD_ADMIN_USER=admin \
+  -e NEXTCLOUD_ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+  -e OBJECTSTORE_S3_BUCKET="${s3_primary_bucket_name}" \
+  -e OBJECTSTORE_S3_REGION="${aws_region}" \
+  -e OBJECTSTORE_S3_USEPATH_STYLE=false \
+  -e OBJECTSTORE_S3_SSL=true \
+  -e OBJECTSTORE_S3_AUTOCREATE=false \
+  -e OBJECTSTORE_S3_USE_EC2_IAM=true \
+  -e NEXTCLOUD_TRUSTED_DOMAINS="*" \
+  -e OVERWRITEPROTOCOL=https \
+  nextcloud:30-apache
+
+echo "===> Nextcloud lance. Attente 30s pour bootstrap..."
+sleep 30
+docker ps
+echo "===> user-data termine avec succes"
