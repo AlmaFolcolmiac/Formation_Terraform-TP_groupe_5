@@ -24,7 +24,15 @@ variable "allowed_admin_cidr" {
   default     = "0.0.0.0/0"
 }
 
-variable "s3_primary_bucket_arn" {
+/*variable "s3_primary_bucket_arn" {
   description = "ARN du primary bucket s3 admin Nextcloud."
+  type        = string
+}*/
+variable "s3_primary_bucket_arn" {
+  description = "ARN du bucket S3 primary storage Nextcloud (fourni par le module data)"
+  type        = string
+}
+variable "s3_logs_bucket_arn" {
+  description = "ARN du bucket S3 logs ALB (fourni par le module data)"
   type        = string
 }

@@ -8,7 +8,7 @@ resource "random_pet" "bucket_suffix" {
 }
 
 locals {
-  name_prefix = "${var.project_name}-${var.environment}"
+  name_prefix = "${var.project_name}-${var.environment}-equipe5"
 
   # Noms globalement uniques pour S3 (account_id + random_pet)
   primary_bucket_name = "${local.name_prefix}-primary-${data.aws_caller_identity.current.account_id}-${random_pet.bucket_suffix.id}"

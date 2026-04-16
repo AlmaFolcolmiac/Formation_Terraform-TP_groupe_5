@@ -34,16 +34,20 @@ module "networking" {
 }
 
 module "security" {
-  source             = "../../modules/security"
-  project_name       = "kolab"
-  environment        = "dev"
-  vpc_id             = module.networking.vpc_id
-  vpc_cidr           = module.networking.vpc_cidr
-  allowed_admin_cidr = var.allowed_admin_cidr
+  source = "../../modules/security"
+
+  project_name          = "kolab"
+  environment           = "dev"
+  vpc_id                = module.networking.vpc_id
+  vpc_cidr              = module.networking.vpc_cidr
+  allowed_admin_cidr    = var.allowed_admin_cidr
+  s3_primary_bucket_arn = module.data.s3_primary_bucket_arn
+  s3_logs_bucket_arn    = module.data.s3_logs_bucket_arn
 }
 
 module "data" {
-  source                 = "../../modules/data"
+  source = "../../modules/data"
+
   project_name           = "kolab"
   environment            = "dev"
   vpc_id                 = module.networking.vpc_id
@@ -54,7 +58,8 @@ module "data" {
 }
 
 module "compute" {
-  source                    = "../../modules/compute"
+  source = "../../modules/compute"
+
   project_name              = var.project_name
   environment               = var.environment
   vpc_id                    = module.networking.vpc_id
@@ -72,7 +77,7 @@ module "compute" {
   s3_logs_bucket_name       = module.data.s3_logs_bucket_name
 }
 
-aws_iam_role_policy "app_s3_scoped" {
+resource "aws_iam_role_policy" "app_s3_scoped" {
   name = "kolab-dev-app-s3-scoped"
   role = module.security.app_iam_role_name
   policy = jsonencode({
