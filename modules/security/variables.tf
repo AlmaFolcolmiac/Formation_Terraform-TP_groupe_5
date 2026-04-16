@@ -23,3 +23,8 @@ variable "allowed_admin_cidr" {
   type        = string
   default     = "0.0.0.0/0"
 }
+
+variable "s3_primary_bucket_arn" {
+  description = "ARN du primary bucket s3 admin Nextcloud."
+  type        = string
+}
