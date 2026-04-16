@@ -1,11 +1,11 @@
 variable "aws_region" {
-  description = "Region AWS cible. eu-west-1 (Irlande) imposee par le CdC RGPD."
+  description = "Region AWS cible. eu-west-3 (Irlande) imposee par le CdC RGPD."
   type        = string
-  default     = "eu-west-1"
+  default     = "eu-west-3"
 
   validation {
-    condition     = var.aws_region == "eu-west-1"
-    error_message = "La region doit etre eu-west-1 (exigence T1 du CdC)."
+    condition     = var.aws_region == "eu-west-3"
+    error_message = "La region doit etre eu-west-3 (exigence T1 du CdC)."
   }
 }
 
