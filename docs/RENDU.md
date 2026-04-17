@@ -52,8 +52,8 @@ VPC 10.30.0.0/16 sur 2 AZ (Paris) avec 6 subnets segmentés par rôle. Un ALB pu
 
 ### Schéma Mermaid (à jour avec ce qui a été réellement déployé)
 
-```mermaid
-flowchart TB
+graph TD
+
     subgraph Internet["Internet (Public)"]
 
         User((Utilisateur))
@@ -163,7 +163,6 @@ flowchart TB
     ALB -- SSL/TLS --> ACM
 
     EC2_A & EC2_B -- Permissions --> IAM
-```
  
 > 🔹 Astuce : copiez le schéma du fichier `ARCHITECTURE.md` que vous avez maintenu pendant la journée.
 
@@ -366,21 +365,20 @@ Estimez le coût de l'infrastructure pour 24h de fonctionnement (dev). Utilisez 
 
 **Ce que j'ai livré** :
 
-- `<!-- ex: modules/networking/main.tf — VPC + 6 subnets + IGW + NAT -->`
-- `<!-- ex: route tables publiques et privées avec associations -->`
-- `<!-- ex: VPC endpoints Gateway S3 + Interface Secrets Manager -->`
-- `<!-- ex: outputs vpc_id, public_subnet_ids, private_app_subnet_ids, private_db_subnet_ids -->`
-- `<!-- ex: README.md du module généré via terraform-docs -->`
+- modules/networking/main.tf — VPC + 6 subnets + IGW + NAT
+- route tables publiques et privées avec associations 
+- VPC endpoints Gateway S3 + Interface Secrets Manager 
+- outputs vpc_id, public_subnet_ids, private_app_subnet_ids, private_db_subnet_ids
+- 
 
 **Ce qui m'a surpris ou frustré** :
 
-> 
+> La compléxité de mise en place d'une réelle solution.
 
-<!-- remplir ici -->
 
 **Ce que j'ai appris** :
 
-<!-- remplir ici -->
+L'utilisation des variables et leurs appel en terraform
 
 **Hash du dernier commit significatif que j'ai fait** : dfde28344ed7b47d85663797f3c9e9e4943f43ec
 
@@ -437,18 +435,18 @@ Estimez le coût de l'infrastructure pour 24h de fonctionnement (dev). Utilisez 
 
 **Ce que j'ai livré** :
 
-- `<!-- ex: modules/security/sg.tf — 3 SG (alb, app, db) avec aws_vpc_security_group_ingress_rule v5 -->`
-- `<!-- ex: modules/security/kms.tf — CMK + alias + rotation activée -->`
-- `<!-- ex: modules/security/iam.tf — IAM role EC2 + instance profile + policies scoped S3/Secrets -->`
-- `<!-- ex: modules/security/secrets.tf — 2 secrets (db_password, admin_password) générés via random_password -->`
+- modules/security/sg.tf — 3 SG (alb, app, db) avec aws_vpc_security_group_ingress_rule v5 
+- modules/security/kms.tf — CMK + alias + rotation activée 
+- modules/security/iam.tf — IAM role EC2 + instance profile + policies scoped S3/Secrets
+- modules/security/secrets.tf — 2 secrets (db_password, admin_password) générés via random_password 
 
 **Ce qui m'a surpris ou frustré** :
 
-<!-- remplir ici -->
+
 
 **Ce que j'ai appris** :
 
-<!-- remplir ici -->
+
 
 **Hash du dernier commit significatif que j'ai fait** : 2e1bb62aba4b59ede628110232bcbc554e4985bf
 
